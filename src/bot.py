@@ -84,8 +84,7 @@ class TelegramClaudeBot:
             "• /status - Show bot and session info\n\n"
             "**Features:**\n"
             "• Full Claude access (no restrictions)\n"
-            "• Persistent conversation context\n"
-            "• Works with bills repo at ~/repos/bills",
+            "• Persistent conversation context",
             parse_mode="Markdown"
         )
 
@@ -145,34 +144,24 @@ class TelegramClaudeBot:
         if is_restricted and not is_admin:
             restricted_slug = config.RESTRICTED_USERS[user_id]
 
-            # Build receipt processing prompt
-            receipt_prompt = f"""You are a receipt processor for a shared household billing system.
+            # Build restricted prompt — customize this for your use case
+            restricted_prompt = f"""You are a restricted assistant for user: {restricted_slug}
 
-User: {restricted_slug}
-Message: {message_text}
+User message: {message_text}
 
-Task:
-1. Extract the amount and description from the message
-2. Create a receipt file in /bills/purchases/{restricted_slug}/ with filename: YYYY-MM-DD_description_AMOUNT.txt
-   - Use today's date
-   - Replace spaces in description with underscores
-   - Amount should be just the number (e.g., 25.50)
-   - Example: 2026-02-15_groceries_25.50.txt
-3. The file content can be empty (the filename IS the data)
-4. Reply to the user confirming what was saved
-
-If the message is unclear, ask for clarification."""
+You have read-only access. You may answer questions and look things up,
+but do NOT create, modify, or delete any files or run any destructive commands."""
 
             # Send "typing..." indicator
             await update.message.chat.send_action("typing")
 
             try:
-                response = await self.claude.send_message(receipt_prompt, user_id, use_continue=False)
+                response = await self.claude.send_message(restricted_prompt, user_id, use_continue=False)
                 await update.message.reply_text(response)
             except Exception as e:
-                error_msg = f"❌ Error processing receipt: {str(e)}"
+                error_msg = f"❌ Error: {str(e)}"
                 await update.message.reply_text(error_msg)
-                logger.exception(f"Error processing receipt: {e}")
+                logger.exception(f"Error handling restricted message: {e}")
 
             return
 

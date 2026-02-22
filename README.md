@@ -5,9 +5,8 @@ A Telegram bot that bridges messages to [Claude Code](https://claude.ai/claude-c
 ## Features
 
 - **Admin mode**: Full conversational Claude with session persistence
-- **Receipt mode**: Restricted users can submit expenses (e.g. `$25.50 groceries`) — Claude saves structured receipt files
+- **Restricted mode**: Give specific users limited, scoped access (e.g. read-only queries, specific tasks)
 - **Photo support**: Send images, Claude analyzes them
-- **Message history**: SQLite-backed history with `/history` and `/stats` commands
 
 ## Requirements
 
@@ -74,18 +73,16 @@ sudo loginctl enable-linger $(whoami)
 | `/help` | Show help |
 | `/clear` | Reset Claude session |
 | `/status` | Session info |
-| `/history` | Recent messages |
-| `/stats` | Usage statistics |
 
-## Receipt Mode
+## Restricted Mode
 
-Add restricted users to `.env` to give them limited access for submitting expenses:
+Add restricted users to `.env` to give them limited, scoped access. Each restricted user gets a slug that you can use in your system prompt to control what they can do:
 
 ```
 RESTRICTED_USERS=123456789:alice,987654321:bob
 ```
 
-They can send messages like `$25.50 groceries` and Claude will save a structured receipt file. They cannot access full Claude features.
+Restricted users interact with a custom system prompt (defined in `src/bot.py`) that limits what Claude will do for them. For example, you could scope them to read-only queries, a specific tool, or a particular task. They cannot access full Claude features.
 
 ## How It Works
 
@@ -97,6 +94,14 @@ The bot is a thin Telegram interface. When you send a message:
 4. Response is sent back to Telegram
 
 Session persistence is handled by Claude CLI `--continue` flag — each message continues the previous conversation.
+
+## Logging
+
+Logs go to journald. View with:
+
+```bash
+journalctl --user -u telegram-claude -f
+```
 
 ## License
 
