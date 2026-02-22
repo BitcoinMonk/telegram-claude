@@ -143,17 +143,17 @@ class TelegramClaudeBot:
 
         # Handle restricted users differently
         if is_restricted and not is_admin:
-            resident_slug = config.RESTRICTED_USERS[user_id]
+            restricted_slug = config.RESTRICTED_USERS[user_id]
 
             # Build receipt processing prompt
             receipt_prompt = f"""You are a receipt processor for a shared household billing system.
 
-User: {resident_slug}
+User: {restricted_slug}
 Message: {message_text}
 
 Task:
 1. Extract the amount and description from the message
-2. Create a receipt file in /bills/purchases/{resident_slug}/ with filename: YYYY-MM-DD_description_AMOUNT.txt
+2. Create a receipt file in /bills/purchases/{restricted_slug}/ with filename: YYYY-MM-DD_description_AMOUNT.txt
    - Use today's date
    - Replace spaces in description with underscores
    - Amount should be just the number (e.g., 25.50)
