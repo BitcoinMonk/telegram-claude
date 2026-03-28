@@ -1,0 +1,11 @@
+{
+  "channels": [
+    {
+      "name": "general",
+      "token_env": "TELEGRAM_BOT_TOKEN",
+      "handler": "general",
+      "admin_ids": [8399249350],
+      "users": []
+    }
+  ]
+}
